@@ -1,0 +1,204 @@
+\documentclass[twoside]{article}
+\usepackage{graphicx}
+\usepackage{lipsum} % Package to generate dummy text throughout this template
+
+\usepackage[sc]{mathpazo} % Use the Palatino font
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\linespread{1.05} % Line spacing - Palatino needs more space between lines
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+
+\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
+\usepackage{multicol} % Used for the two-column layout of the document
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
+\usepackage{booktabs} % Horizontal rules in tables
+\usepackage{float} % Required for tables and figures in the multi-column environment - they need to be placed in specific locations with the [H] (e.g. \begin{table}[H])
+\usepackage{hyperref} % For hyperlinks in the PDF
+
+\usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
+\usepackage{paralist} % Used for the compactitem environment which makes bullet points with less space between them
+
+\usepackage{abstract} % Allows abstract customization
+\renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
+
+\usepackage{titlesec} % Allows customization of titles
+\renewcommand\thesection{\Roman{section}} % Roman numerals for the sections
+\renewcommand\thesubsection{\Roman{subsection}} % Roman numerals for subsections
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
+\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{} % Change the look of the section titles
+
+\usepackage{fancyhdr} % Headers and footers
+\pagestyle{fancy} % All pages have headers and footers
+\fancyhead{} % Blank out the default header
+\fancyfoot{} % Blank out the default footer
+\fancyhead[C]{EECS C149 : SENSOR INTERFACING AND CALIBRATION \hfill September 7, 2014} % Custom header text
+\fancyfoot[RO,LE]{\thepage} % Custom footer text
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{\vspace{-15mm}\fontsize{24pt}{10pt}\selectfont\textbf{Interface to and Calibrate the WiiMote}} % Article title
+
+\author{
+\large
+\textsc{Aaron Feldman, \ Antonio Rohit}\\[2mm] % Your name
+\normalsize University of California, Berkeley \\ % Your institution
+\normalsize 
+\vspace{-5mm}
+}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle % Insert title
+
+\thispagestyle{fancy} % All pages have headers and footers
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT
+%----------------------------------------------------------------------------------------
+
+\begin{abstract}
+
+\noindent Calibrating and interpreting data from a digital sensor, specifically the accelerometers  from the Wii Remote. Interfacing a computer running Windows OS with the Wii Remote via Bluetooth HID wireless link, obtaining raw data from its accelerometer, calibration of the raw data, and display of the results in NI LabVIEW.
+
+\end{abstract}
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
+\begin{multicols}{2} % Two-column layout throughout the main article text
+
+\section{Pair a desktop computer with the WiiMote}
+
+Using the provided resourse LabVIEW VI WiiMote Pair.vi, we were able to connect the Wii Remote via Bluetooth to a Windows 7 Computer. This took unblocking multiple downloaded files and a system reboot. The MAC address of the Wii Remote used was 8C:56:C5:5A:0D:0A.
+
+\begin{center}
+\includegraphics*[width = 6cm]{FIG1.png}\\
+Figure 1: WiiMote Pair.vi
+\end{center}
+
+%------------------------------------------------
+
+\section{Plot the uncalibrated accelerometer signal from the WiiMote}
+
+After pairing we opened and ran the provided LabView VI Interface.vi. With this we were able to gain access to the raw accelerometer data. With the Wii Remote at rest on level ground with the face (z direction) up we took readings for the $x$, $y$, and $z$ accelerometers. 
+
+\begin{equation}x = 128
+\end{equation}
+\begin{equation}y = 128
+\end{equation}
+\begin{equation}z = 156
+\end{equation}
+
+\noindent As we can see the z accelerometer's value is noticeably higher. This is because this value is measuring both bias and gravitational force.
+
+%------------------------------------------------
+
+\section{Control the WiiMote actuators}
+
+Using the front panel of WiiMote Interface.vi, we are able to send instructions to the Wii Remote using the Transmission panel.
+
+\begin{center}
+\includegraphics*[width = 6cm]{FIG2.png}\\
+Figure 2: Transmission panel
+\end{center}
+
+\noindent Using $HID Transmit: 0x52$, $Report ID: 0x11$, $Payload: 0xa0$ we are able to turn the Wii Remote LEDs 2 and 4 on, and LEDs 1 and 3 off. This is because the microcontroller controls the LEDs with the first nibble of the $Payload$ byte, where a 0 represents off and a 1 represents on, with bits 4 controlling the first LED and bit 7 controlling the last and other bits respectively. Therefore 0b10100000 (0xa0) turn the LEDs 2 and 4 on, and LEDs 1 and 3 off. If we modify the instructions to $Payload: 0xa1$ we are able to also enable to rumble motor, as the microcontroller controls the rumble motor with the same $Report ID$ with the last bit of the $Payload$ set to $0b1$.
+
+%------------------------------------------------
+
+\section{Measure sensitivity and bias of the accelerometer}
+
+We made the following modifications to the Event Structure in the LabVIEW Block Diagram to enable both the bias and sensitivity buttons on the control panel.
+
+\begin{center}
+\includegraphics*[width = 7cm]{FIG3.png}\\
+Figure 3: Event Structure Bias Modifications
+\end{center}
+
+\begin{center}
+\includegraphics*[width = 7cm]{FIG4.png}\\
+Figure 4: Event Structure Sensitivity Modifications
+\end{center}
+
+\noindent The bias and sensitivity are both stored in $I16$ type variables in the LabVIEW environment. We measured a bias of 128 ADC Units and a sensitivity of 27 ADC Units.
+
+
+\section{Calibrate the accelerometer}
+
+We modified the contents of the MathScript Node in WiiMote Interface.vi so that the Accelerometer (calibrated) chart plots acceleration of the $x$, $y$, and $z$ axes, and the magnitude indicator displays the magnitude of acceleration, all in units of $g^s$. In order to calibrate the accelerometer we used the equation $\hat{A}_{calibrated} = (\hat{A}_{raw} - bias) / sensitivity$. In order to calculate the magnitude of the acceleration we used the equation $|A|\; =\; \sqrt{x^{2}\; +\; y^{2}\; +\; z^{2}}$. \\
+
+\noindent Based on our calibration parameters and the bit resolution and sensitivity of the Wii Remote we can calculate an estimate for the maximum acceleration that the Wii Remote can measure. To do this we take the Wii's bit resolution of 256 bits, subtract the bias and divide by the sensitivity. $(256 - 128) / 27 \approx 4.7g$.\\
+
+\noindent When the Wii Remote is at rest the magnitude indicator should be $\approx$ 1. This is because the Wii Remote should be experiencing no acceleration other than that due to gravitational forces.\\
+
+\noindent It is better to perform calibration at runtime, rather than hard-coding values for the sensitivity and bias of the sensor for many reasons. One reason is that it makes it possible to easily replace sensors if they are malfunctional. Another is that it allows you to easily change the bias if the bias happens to change for a sensor and also compensate in a mass design setting for manufacture differences between different sensors without having to measure and manually calculate each devices sensors individually.
+
+\pagebreak
+\noindent To implement all of this into LabVIEW we used the MathScript codes:
+
+\begin{equation}a = (aRaw - bias)/sens;
+\end{equation}
+
+\begin{equation}mag = sqrt(a(1)^2 + a(2)^2 + a(3)^2);
+\end{equation}
+
+\begin{center}
+\includegraphics*[width = 6cm]{FIG5.png}\\
+Figure 5: Code Block Modifications
+\end{center}
+
+%----------------------------------------------------------------------------------------
+
+\section{Measure Pitch and Roll}
+
+We were able to modify the contents of the MathScript Node in WiiMote Interface.vi so that the Orientation (calibrated) chart plots pitch and roll or the Wii Remote in units of degrees. To do this we calculated pitch and roll with:
+
+\begin{equation}pitch \; = \;\arctan \left( \frac{G_{y}}{\sqrt{G_{x}^{2}\; +\; G_{z}^{2}}} \right)
+\end{equation}
+
+\begin{equation}roll \; = \;  \arctan \left( -\frac{G_{x}}{G_{z}} \right)
+\end{equation}
+
+Converting equation 6 to MathScript:
+\begin{equation}atan2(a(2), sqrt(a(1)^2+a(3)^2));
+\end{equation}
+
+Converting equation 7 to MathScript:
+\begin{equation}atan2(-a(1),a(3));
+\end{equation}
+
+\begin{center}
+\includegraphics*[width = 6cm]{FIG6.png}\\
+Figure 6: Code Block Modifications
+\end{center}
+
+%----------------------------------------------------------------------------------------
+
+\section{Filter the accelerometer signal}
+
+Accelerometers are often used to detect high frequency signals such as noise and vibration; for a game controller, lower-frequency movements of the user should be isolated. In particular, the rumble motor will introduce a high-frequency signal. We implemented a moving average lowpass filter to smooth the signal of the calibrated accelerometer when the rumble motor is on. 
+
+\noindent On a discrete signal like the digital signals used in electronics and more specifically the Wii Remote, we can weight both the current value of the remotes accelerometer output with the previous value. In averaging these weighted values together, we can adjust the weights to provide more or less sensitivity of our output to the current input value. If there are extreme fluctuations in our value, say due to  a rumble motor, we are in this way able to average them out. For our moving average low pass filter we used the equation $ y[n] = (1 - \alpha)*y[n-1] + \alpha*x[n] $. This has a frequency response of $ H(z) \; = \; \left( \frac{\alpha}{1-(1-\alpha)z^{-1}}  \right) $. We used values from $\alpha = 0.1 \rightarrow \alpha = 0.001$ with good results.
+
+\begin{equation} A_{filtered} = (1 - k)+a0 + k * a;
+\end{equation}
+
+\begin{center}
+\includegraphics*[width = 6cm]{FIG7.png}\\
+Figure 7: Moving Average Low Pass Filter
+\end{center}
+
+%----------------------------------------------------------------------------------------
+
+\section{Lab Feedback}
+
+This lab was a great introduction to connecting via Bluetooth and calibrating sensors. In the future it would be nice to see this lab implemented in an OS other than Windows (Linux/OS X). (Yes that would require re-imaging/dual booting the lab computers). This would possibly bring this lab more in line with newer trends in the marketplace and remove many of the head aches that are Windows specific. 
+
+\end{multicols}
+
+\end{document}

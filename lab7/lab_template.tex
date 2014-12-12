@@ -1,0 +1,135 @@
+\documentclass[twoside]{article}
+\usepackage[top=0.75in, bottom=0.5in, left=0.5in, right=0.5in, columnsep=20pt]{geometry}
+\usepackage[framed,numbered,autolinebreaks,useliterate]{mcode}
+\usepackage{listings}
+\usepackage{graphicx}
+
+
+\usepackage[framed,numbered,autolinebreaks,useliterate]{mcode} 
+\usepackage{listings}
+
+\usepackage{lipsum} % Package to generate dummy text throughout this template
+
+\usepackage[sc]{mathpazo} % Use the Palatino font
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\linespread{1.05} % Line spacing - Palatino needs more space between lines
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+
+%\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
+\usepackage{multicol} % Used for the two-column layout of the document
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
+\usepackage{booktabs} % Horizontal rules in tables
+\usepackage{float} % Required for tables and figures in the multi-column environment - they need to be placed in specific locations with the [H] (e.g. \begin{table}[H])
+\usepackage{hyperref} % For hyperlinks in the PDF
+
+\usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
+\usepackage{paralist} % Used for the compactitem environment which makes bullet points with less space between them
+
+\usepackage{abstract} % Allows abstract customization
+\renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
+
+\usepackage{titlesec} % Allows customization of titles
+\renewcommand\thesection{\Roman{section}} % Roman numerals for the sections
+\renewcommand\thesubsection{\Roman{subsection}} % Roman numerals for subsections
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
+\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{} % Change the look of the section titles
+
+\usepackage{fancyhdr} % Headers and footers
+\pagestyle{fancy} % All pages have headers and footers
+\fancyhead{} % Blank out the default header
+\fancyfoot{} % Blank out the default footer
+\fancyhead[C]{EECS C149/249A : Project Managment \hfill October 21, 2014} % Custom header text
+\fancyfoot[RO,LE]{\thepage} % Custom footer text
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{\vspace{-15mm}\fontsize{24pt}{10pt}\selectfont\textbf{Voice Controlled Robotic Hand}} % Article title
+
+\author{
+\large
+\textsc{Aaron Feldman}\\[2mm] % Your name
+\normalsize University of California, Berkeley \\ % Your institution
+\vspace{-5mm}
+}
+\date{}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle % Insert title
+
+\thispagestyle{fancy} % All pages have headers and footers
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT
+%----------------------------------------------------------------------------------------
+
+%
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
+\section{Check out a Repository:}
+Since my project partner Lily is new to version control and Git specifically, we walked her through creating a new Git repository. For simplicity sake, we used the GitHub App to create the repository named Robot-Arm at https://sithub.com/shanqli/Robot-Arm. I then had her add Chance and I as contributors to the master branch of the Robot-Arm project. I then checked out a branch via the github website and cloned it to my local drive.
+\begin{center}
+\includegraphics*[width = 8cm]{Fig1.png}\\
+Figure 1: Creating a Repository
+\end{center}
+
+
+
+
+
+%------------------------------------------------
+
+\section{Add Files to your Repository:}
+First I had both Chance and Lily modify the readme on the repository. Then I walked them through merge conflicts when they had both modified the same file separately. I then modified the file and pushed it.
+
+\vspace{-5mm}
+\begin{lstlisting}[mathescape, frame=single]
+git add README.md
+git commit -m "aarons update"
+git push
+\end{lstlisting}
+
+%------------------------------------------------
+\section{Plan your Project:}
+We then planned our project. Our plan is to use the mbed FRMD KL25Z from Freescale as the processor core driving servos (either GM995 servos or the Bioloids from the stock in 204 Cory or servos from the Invention Lab supply) installed in a 3d printed robotic hand. The first step in the project will be to design a robotic hand that can be 3d printed and assemble it with the mbed system. One possible candidate for the design is InMoov (http://www.thingiverse.com/thing:17773). The first goal will be to get the hand to perform a preset sequence of gestures. Secondly we will integrate a EasyVR Shield 2.0 - Voice Recognition Shield to the platform. Combining these two systems will enable us to voice control the robotic hand. Time permitting, we plan to build and program an electromyogram which can be added as an additional sensor to the system, where we will detect potential from muscle movement and thus command the robotic hand.
+
+%------------------------------------------------
+\section*{Set Milestones and a Schedule:}
+\begin{compactitem}
+\item October 21: Project charter
+\item October 29: 3D printing robotic hand parts. Choice of platform finalized after discussion with GSIs. Order supplies.
+\item November 5: Assembled 3D printing hands parts. Trials on motor and sensors.
+\item November 12: Statecharts simulation model on platforms.
+\item November 19: Mini project update: Demonstrate sensor and servo action.
+\item November 26: Measured sensor accuracy, modify simulation model.
+\item December 3: Actuation in response to voice sensors.
+\item December 10: System testing.
+\item December 16: Demonstration video made, powerpoint prepared.
+\item December 17: Final presentation and demo.
+\item December 19: Project report and video turned in. 
+\end{compactitem}
+
+%------------------------------------------------
+\section{Set a Work Breakdown Structure:}
+\begin{center}
+\includegraphics*[width = 19cm]{Fig2.png}\\
+Figure 1: Work Breakdown Structure
+\end{center}
+%------------------------------------------------
+
+\section{Individual Writeup:}
+
+The critical path of the WBS extends from the procurement of the needed materials to the project report which is about a month and a half. For the design phase we've schedule two weeks. Development we've overlapped some of our design phase and we have 2 weeks scheduled for that aslo. Debugging gets most of our time with three weeks. To combat any delays, we will schedule the completion of the actual system a week before the project due date. No mentors have been chosen yet but on our next meeting we will discuss this possibility.
+
+\section{Feedback:}
+I noticed that you are using subversion in the lab, and that this is now going out of style and most places in industry now are moving to Git. It would be nice to see this as the default version control system for the future.
+
+\end{document}

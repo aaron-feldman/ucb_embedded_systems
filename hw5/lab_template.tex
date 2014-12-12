@@ -1,0 +1,138 @@
+\documentclass[twoside]{article}
+\usepackage[top=1in, bottom=1in, left=0.75in, right=0.75in, columnsep=20pt]{geometry}
+\usepackage[framed,numbered,autolinebreaks,useliterate]{mcode}
+\usepackage{listings}
+\usepackage{graphicx}
+
+\newenvironment{qparts}{\begin{enumerate}[{(}a{)}]}{\end{enumerate}}
+\def\endproofmark{$\Box$}
+\newenvironment{proof}{\par{\bf Proof}:}{\endproofmark\smallskip}
+
+\usepackage{lipsum} % Package to generate dummy text throughout this template
+
+\usepackage[sc]{mathpazo} % Use the Palatino font
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\linespread{1.05} % Line spacing - Palatino needs more space between lines
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+
+%\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
+\usepackage{multicol} % Used for the two-column layout of the document
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
+\usepackage{booktabs} % Horizontal rules in tables
+\usepackage{float} % Required for tables and figures in the multi-column environment - they need to be placed in specific locations with the [H] (e.g. \begin{table}[H])
+\usepackage{hyperref} % For hyperlinks in the PDF
+
+\usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
+\usepackage{paralist} % Used for the compactitem environment which makes bullet points with less space between them
+
+\usepackage{abstract} % Allows abstract customization
+\renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
+
+\usepackage{titlesec} % Allows customization of titles
+\renewcommand\thesection{\Roman{section}} % Roman numerals for the sections
+\renewcommand\thesubsection{\Roman{subsection}} % Roman numerals for subsections
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
+\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{} % Change the look of the section titles
+
+\usepackage{fancyhdr} % Headers and footers
+\pagestyle{fancy} % All pages have headers and footers
+\fancyhead{} % Blank out the default header
+\fancyfoot{} % Blank out the default footer
+\fancyhead[C]{EECS C149 : HW 5 \hfill October 28, 2014} % Custom header text
+\fancyfoot[RO,LE]{\thepage} % Custom footer text
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{\vspace{-15mm}\fontsize{24pt}{10pt}\selectfont\textbf{Multitasking, Invariants and Temporal Logic}} % Article title
+
+\author{
+\large
+\textsc{Aaron Feldman}\\[2mm] % Your name
+\normalsize University of California, Berkeley \\ % Your institution
+\vspace{-5mm}
+}
+\date{}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle % Insert title
+
+\thispagestyle{fancy} % All pages have headers and footers
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT
+%----------------------------------------------------------------------------------------
+
+
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
+%\begin{multicols}{2} % Two-column layout throughout the main article text
+\subsection*{Chapter 11 EX 2:}
+To the best of my knowledge, there isn't a solution that would remove the necessity of locking b before a as in the example, since this is a requirement given by the development team and a will need to remain locked around the if statement on line 9, as it is possible that a context switch will occur and the value of a could change from another thread. Therefore I don't think there is a solution to this.
+
+\subsection*{Chapter 11 EX 4:}
+\vspace{-5mm}
+\begin{lstlisting}[mathescape, frame=single]
+
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+int Queue_Size = 0;
+int Waiters = 0;
+void* producer (void* arg) {
+	int i;
+	for (i = 0; i< 10; i++) {
+		pthread_mutex_lock(&lock);
+		while (Queue_Size > 5) {
+			Waiters++;
+			pthread_cond_wait(&cond, &lock);
+		}
+		send(i);
+		Queue_Size--;
+		pthread_mutex_unlock(&lock);
+	}
+	return NULL;
+}
+void* consumer(void* arg) {
+	while(1) {
+		pthread_mutex_lock(&lock);
+		Queue_Size--;
+		printf("received %d\n", get());
+		if (Waiters > 0) {
+			pthread_cond_signal(&cond);
+		}
+		pthread_mutex_unlock(&lock);
+	}
+	return NULL;
+}
+\end{lstlisting}
+
+
+\subsection*{Chapter 13 EX 1:}
+\begin{qparts}
+\item False, consider a system where p toggles p/$\neg$p, this satisfies 
+\item True, 
+\end{qparts}
+
+\subsection*{Chapter 13 EX 2:}
+\begin{qparts}
+\item False, consider input x present at (c), it can never transition to (b)
+\item False, consider (c), it can never transition out and give output y = 1
+\item True
+\item True
+\item True
+\item True
+\item False, when in (a) $\neg$ x will put us in (b), but a x at this point will keep us from (c)
+\end{qparts}
+
+
+
+%------------------------------------------------
+\end{document}

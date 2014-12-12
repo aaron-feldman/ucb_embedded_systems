@@ -1,0 +1,5 @@
+\BOOKMARK [1][-]{section.1}{Configure a Periodic Timed Interrupt:}{}% 1
+\BOOKMARK [1][-]{section.2}{Starve the Processor:}{}% 2
+\BOOKMARK [1][-]{section.3}{Poll the ADC:}{}% 3
+\BOOKMARK [1][-]{section.4}{Use Timed Interrupts to Poll the ADC:}{}% 4
+\BOOKMARK [1][-]{section.5}{Use ADC and Timed Interrupts to Read the ADC:}{}% 5

@@ -1,0 +1,127 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,textcomp,amssymb,geometry,graphicx,enumerate}
+\usepackage{listings}
+\usepackage[framed,numbered,autolinebreaks,useliterate]{mcode}
+
+
+\def\Name{Aaron Feldman}  % Your name
+\def\SID{23983332}  % Your student ID number
+\def\Login{ee149-ch} % Your login (your class account, cs170-xy)
+\def\Homework{2}%Number of Homework
+\def\Session{Fall 2014}
+
+
+\title{EECS149--Fall 2014 --- Solutions to Homework \Homework}
+\author{\Name, SID \SID, \texttt{\Login}}
+\markboth{EECS149--\Session\  Homework \Homework\ \Name}  {EECS149--\Session\ Homework \Homework\ \Name, \texttt{\Login}}
+\pagestyle{myheadings}
+
+\newenvironment{qparts}{\begin{enumerate}[{(}a{)}]}{\end{enumerate}}
+\def\endproofmark{$\Box$}
+\newenvironment{proof}{\par{\bf Proof}:}{\endproofmark\smallskip}
+
+\textheight=9in
+\textwidth=6.5in
+\topmargin=-.75in
+\oddsidemargin=0.25in
+\evensidemargin=0.25in
+
+
+\begin{document}
+\maketitle
+
+\section*{Chapter 10 - Ex 2}
+\begin{qparts}
+\item
+Strictly speaking, atomic means that it's the smallest computational element. That means that we would need the processor to be able to compute A, B, C in one line of assembly code and that the processor can compute it in 1 clock cycle. Consider the case where this wasn't true, but we disabled interrupts before entering A, B, or C, and re-enabled them after. If they weren't "atomic" where it took the processor 1 cycle to compute, then if the system loses power during execution of A, B, C, then we can't be guaranteed that once entering A, B, C, that they will be completed upon power up.
+\end{qparts}
+
+
+
+\section*{Chapter 10 - Ex 3}
+\begin{lstlisting}[frame=single]
+#include <stdio.h>
+
+volatile uint timerCount = 0;
+void countUp(void) {
+	timerCount++;
+}
+
+int main(void) { 
+	timerCount = 0; // reset for system start
+	SysTickPeriodSet(SysCtlClockGet() / 100);
+	SysTickIntRegister(&countUp);
+	SysTickEnable();
+	SysTickIntEnable();
+	
+	return 0;
+}
+\end{lstlisting}
+
+\noindent This clock will run for the max 32 int size / 100 seconds before overflowing.\\
+ $2,147,483,647/100 = 21,474,836.47 s$
+
+
+
+
+\section*{Chapter 10 - Ex 4}
+\begin{lstlisting}[frame=single]
+volatile static uint8_t alerted;
+volatile static char* display;
+void ISRA() {
+	if (alerted ==0) {
+			display = "normal";
+	}
+}
+void ISRB() {
+	display = "emergency";
+	alerted = 1;
+}
+void main() {
+	alerted = 0;
+		...
+}
+\end{lstlisting}
+
+\begin{qparts}
+\item We are not guaranteed that this program will function as designed. If the ISRB routine interrupts ISRA after line 4 then the system will display "emergency" from the ISRB routine then return to ISRA and continue execution on line 5 to then display "normal."
+\end{qparts}
+
+\section*{Chapter 10 - Ex 7}
+\begin{qparts}
+\item
+Whether or not that it is possible for the ISR to update the value of sensor1 while the main function is checking whether sensor1 is faulty would depend on the ISA of the platform. So without knowing the platform, we won't be guaranteed that the ISR couldn't update the value of sensor1. That said, isFaulty(sensor1) is a function call and probably won't be executed atomically in most ISA's, leading us to suspect that it could be interrupted and have the value of sensor1 updated during a call in main.
+
+\item
+It's very possible that the faulty sensor wouldn't be reported. This is because the value may be updated to a non-faulty value before preceding the be checked in the main loop.
+
+\item
+If the timer was set for too short of an interval, the main function might not be able to exectute, hence the if statements checking for faulty sensors might never be executed.
+
+\item
+Yes, having multiple threads or not does not effect the possibility that the call to "isFaulty(sensor1/2)" isn't necessarily atomic. Hence during the call, the value for sensor1/2 might be updated before the call is returned. This then means we can't guarantee that the value wasn't changed and could result in undesirable behavior of the program.
+\end{qparts}
+
+\section*{Chapter 2 - Ex 4}This model is neither LTI nor BIBO stable.
+
+\section*{Chapter 2 - Ex 5}
+\begin{qparts}
+\item $\theta \left( t \right)\; =\; \theta \left( 0 \right)\; +\; \int_{0}^{t}{\dot{\theta }\left( \tau  \right)d\tau }$\\
+
+\item No, the system is not BIBO.
+\item $=\; \int_{0}^{t}{K\left( \psi \left( \tau  \right)\; -\; \theta \left( \tau  \right) \right)d\tau }$\\
+
+$=\; \int_{0}^{t}{Kau\left( \tau  \right)d\tau \; -\; \int_{0}^{t}{K\theta \left( \tau  \right)d\tau }}$\\
+
+$=\; Kat\; -\; K\int_{0}^{t}{\theta \left( \tau  \right)d\tau }$\\
+
+$=\; au\left( t \right)\left( 1\; -\; e^{-kt} \right)$\\
+
+$\rightarrow \; \theta \left( 0 \right)\; =\; 0$\\
+
+$\rightarrow \; \theta \left( \infty  \right)\; =\; a$
+\end{qparts}
+
+
+
+\end{document}

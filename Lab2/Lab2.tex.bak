@@ -1,0 +1,230 @@
+\documentclass[twoside]{article}
+\usepackage{graphicx}
+\usepackage{lipsum} % Package to generate dummy text throughout this template
+
+\usepackage[sc]{mathpazo} % Use the Palatino font
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\linespread{1.05} % Line spacing - Palatino needs more space between lines
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+
+\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
+\usepackage{multicol} % Used for the two-column layout of the document
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
+\usepackage{booktabs} % Horizontal rules in tables
+\usepackage{float} % Required for tables and figures in the multi-column environment - they need to be placed in specific locations with the [H] (e.g. \begin{table}[H])
+\usepackage{hyperref} % For hyperlinks in the PDF
+
+\usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
+\usepackage{paralist} % Used for the compactitem environment which makes bullet points with less space between them
+
+\usepackage{abstract} % Allows abstract customization
+\renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
+
+\usepackage{titlesec} % Allows customization of titles
+\renewcommand\thesection{\Roman{section}} % Roman numerals for the sections
+\renewcommand\thesubsection{\Roman{subsection}} % Roman numerals for subsections
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
+\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{} % Change the look of the section titles
+
+\usepackage{fancyhdr} % Headers and footers
+\pagestyle{fancy} % All pages have headers and footers
+\fancyhead{} % Blank out the default header
+\fancyfoot{} % Blank out the default footer
+\fancyhead[C]{EECS C149 : Embedded Development Tools \hfill September 18, 2014} % Custom header text
+\fancyfoot[RO,LE]{\thepage} % Custom footer text
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{\vspace{-15mm}\fontsize{24pt}{10pt}\selectfont\textbf{Configure and Program the myRIO}} % Article title
+
+\author{
+\large
+\textsc{Aaron Feldman, \ Antonio Rohit de Lima Fernandes}\\[2mm] % Your name
+\normalsize University of California, Berkeley \\ % Your institution
+\normalsize 
+\vspace{-5mm}
+}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle % Insert title
+
+\thispagestyle{fancy} % All pages have headers and footers
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT
+%----------------------------------------------------------------------------------------
+
+\begin{abstract}
+
+\noindent In this lab, we got familiar with connecting to, configuring, and programming the myRIO. We did this using a number of development tools - LabVIEW, NI MAX, Xilinx SDK, and Eclipse. This lab write-up demonstrates and summarizes the authors' experience through the process.
+\end{abstract}
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
+\begin{multicols}{2} % Two-column layout throughout the main article text
+
+\section{Connect to and Configure the myRIO}
+
+Through the prelab, the authors (henceforth referred to as 'we') developed a familiarity with the myRIO model 1950. This is an embedded micro-controller with two independent processors on board: an ARM Cortex-A9 and an FPGA. 
+
+\begin{center}
+\includegraphics*[width = 6cm]{Fig1.jpg}\\
+Figure 1: myRIO board
+\end{center}
+
+\textbf Labview:
+
+To begin with, we placed the battery into the myRIO, powered it and connected the myRIO to the computer. To configure it, we launched the getting started wizard from LabVIEW for myRIO>Set Up and Explore.
+
+The myRIO was discovered by the software. We renamed it and verified that the accelerometer, button and LEDs were responding as expected. In particular, we noticed that at rest, the Z-acceleration was 1 g, while X and Y were 0. 
+
+\begin{center}
+\includegraphics*[width = 6cm]{Fig2.png}\\
+Figure 2: myRIO Onboard Devices
+\end{center}
+
+\textbf NI MAX:
+
+Next, in order to see detailed information about the myRIO, we switched to the NI MAX tool - which provides many configurations options for the myRIO - Network adapters, Installed software, Date/Time, Web services management, Web server config, and Installed config tools. Most importantly, it displayed the IP address of the myRIO - which is useful to access the board. Once we were done, we restarted the myRIO from software.
+
+\begin{center}
+\includegraphics*[width = 6cm]{Fig3.png}\\
+Figure 3: myRIO through NI MAX
+\end{center}
+ 
+%------------------------------------------------
+
+\section{Program MicroBlaze from Xilinx SDK}
+
+Now that we configured the myRIO, we were ready to program the FPGA on board. ote that though the steps seemed straightforward, this was the section we had most trouble with - we had to return on a separate day to finish this section of the lab.
+
+\noindent The first step was to connect the Xilinx Platform cable to JTAG header J5 on board. This required attention to detail to get the pins mapped correctly. When correctly mapped (power and gnd particularly), the status LED on the platform cable turns from yellow to green. 
+
+\begin{center}
+\includegraphics*[width = 6cm]{Fig4.jpg}\\
+Figure 4: myRIO through NI MAX
+\end{center}
+
+\noindent Next, we programmed the Xilinx FPGA on board with the MicroBlaze soft-core processor. This was done by downloading the provided bitfile onto the flash memory of the FPGA using the RIO Device Setup tool. We verified that LED1 was glowing as expected.
+
+\begin{center}
+\includegraphics*[width = 6cm]{Fig5.png}\\
+Figure 5: Successful Bitfile Download!
+\end{center}
+
+The FPGA was now configured as a MicroBlaze processor, and was ready to be programmed. To do so, we opened the Xilinx SDK in the C/C++ perspective, and imported the MicroBlaze hardware support package provided.
+
+Following the instructions, we cleaned the workspace, created a new project named hellowWorldMicroBlaze, and then built and ran it. We modified the code to print "Hello Wurld" to STDIO. 
+
+\begin{center}
+\includegraphics*[width = 6cm]{Fig6_1.png}\\
+Figure 6: Xilinx SDK Hello World
+\end{center}
+
+Next, in order to issue commands to the FPGA using the XMD console, we entered into Debug mode, and sent commands like $rst$ and $stop$. 
+
+\begin{center}
+\includegraphics*[width = 6cm]{Fig7.png}\\
+Figure 7: Using XMD Console to Issue Commands
+\end{center}
+
+
+%------------------------------------------------
+
+\section{Program myRIO Processor from Eclipse}
+
+In the previous exercise, we programmed the FPGA. This exercise focused on programming the ARM Cortex-A9 on the board, running Linux. 
+
+To do so, we began by entering the IP address of the myRIO in a browser to configure the A9 to allow SSH. The myRIO was restarted in order for these settings to take effect.
+
+\begin{center}
+\includegraphics*[width = 6cm]{Fig8.png}\\
+Figure 8: Web Config Interface
+\end{center}
+
+
+\noindent It was time to begin using Eclipse. We opened it, imported the provided template project, and renamed it to myRIO Hello World. The model number that the project had by default (in the Properties > C/C++ General > Paths and Symbols setting) was $MyRio\_1900$, so we changed this to $MyRio\_1950$ to correspond to the hardware. We verified that the project built successfully.
+
+Since we needed to dig into the file system of the A9, we launched the Remote System Explorer (RSE) perspective in Eclipse. We created a new connection to the myRIO connected the the desktop by using its IP address, and this made it show up in the Remote Systems pane.
+
+Then we connected to it by using the username: "admin" and a blank password. We launched a terminal window and entered the uname -all command to display the information about the Linux OS on myRIO.
+
+\begin{center}
+\includegraphics*[width = 6cm]{Fig9.png}\\
+Figure 9: Remote Systems Pane and SSH
+\end{center}
+
+Very interestingly, the FPGA can be configured through this Linux interface, in a different manner than what we did in the previous section.
+
+Just by exporting a bitfile to /var/local/natinst/bitfiles in the filesystem the myRIO  programs the FPGA when the application code runs!
+
+\begin{center}
+\includegraphics*[width = 6cm]{Fig10.png}\\
+Figure 10: Location to Store bitfile
+\end{center}
+
+
+Now that we were done with the Remote Systems perspective, we switched back to the C/C++ perspective to program a Hello World project on the A9.
+
+We added a printf statement to the application code area. Then, we created a debug configuration, following the instructions provided, and then launched a debug session. 
+
+By stepping over code, we were able to have "Hello World" print to STDIO.
+
+\begin{center}
+\includegraphics*[width = 6cm]{Fig11.png}\\
+Figure 11: Hello World Debug Session 
+\end{center}
+
+We can even control hardware through this same program! We modified the code as suggested in the instructions, using the line $NiFPGA\_WriteUS(myrio\_session, D0LED30, 0$x$0x)$ to control the LEDs. Here x determines which combination of LEDs are on. The figure below has x = 2, i.e. LED2 is on. 
+
+\begin{center}
+\includegraphics*[width = 6cm]{Fig12.png}\\
+Figure 12: Modified Code to Control LEDs
+\end{center}
+
+%------------------------------------------------
+
+\section{Program myRIO Processor from LabVIEW}
+
+In the previous two sections, we programmed the myRIO using Xilinx SDK (for the FPGA directly), then Eclipse (for the A9 and indirectly the FPGA), and now use LabVIEW for the A9.
+
+For this, we created a new myRIO project called Acceleration Threshold. We ran it and verified that the acceleration worked as expected.
+
+\begin{center}
+\includegraphics*[width = 7cm]{FIG13.png}\\
+Figure 13: Acceleration Graphs using LabVIEW
+\end{center}
+
+Next we opened up the block diagram of the project. Our aim was to control 3 LEDs - LED0, LED1, and LED2, using the 3-axis accelerometer on board. If the acceleration in a particular axis exceeded a configurable threshold, the LED was supposed to go on. 
+
+The block diagram below shows how we implemented it:
+
+\begin{center}
+\includegraphics*[width = 7cm]{FIG14.png}\\
+Figure 14: LEDs Controlled By Accelerometer
+\end{center}
+
+This is how the GUI looked:
+
+\begin{center}
+\includegraphics*[width = 6cm]{Fig15.png}\\
+Figure 15: LED control with Configurable Thresholds
+\end{center}
+
+\noindent How this was done: A linear slider was fed into 3 comparator
+
+\section{Lab Feedback}
+
+This lab was a great introduction to connecting via Bluetooth and calibrating sensors. In the future it would be nice to see this lab implemented in an OS other than Windows (Linux/OS X). (Yes that would require re-imaging/dual booting the lab computers). This would possibly bring this lab more in line with newer trends in the marketplace and remove many of the head aches that are Windows specific. 
+
+\end{multicols}
+
+\end{document}
